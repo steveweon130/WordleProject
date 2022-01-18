@@ -1,0 +1,11 @@
+#BlueJ class context
+comment0.target=WordleChances
+comment1.params=
+comment1.target=WordleChances()
+comment2.params=
+comment2.target=boolean\ isntDone()
+comment3.params=
+comment3.target=void\ wrongAgain()
+comment4.params=
+comment4.target=int\ getWrongGuesses()
+numComments=5
