@@ -3,19 +3,24 @@ import java.util.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.*;
+import java.util.Scanner;
 
 public class Puzzle {
     private String temp, word, guess;
     private int index, correct;
-    private boolean noInput, symbols, notFiveLetter;
+    private boolean noInput, symbols, notFiveLetter, notWord;
     private String[][] grid;
+    private ArrayList<String> words, possibleWords;
     
     public Puzzle() {
         temp = guess = "";
-        noInput = symbols = notFiveLetter = false;
+        noInput = symbols = notFiveLetter = notWord = false;
         index = correct = 0;
         grid = new String[6][5];
-        word = "plank";
+        words = new ArrayList<String>();
+        possibleWords = new ArrayList<String>();
+        loadWords("words.txt");
+        word = words.get((int)(Math.random() * (words.size()+1)));
         for (int row = 0; row < grid.length; row++) {
             for (int col = 0; col < grid[0].length; col++) {
                 grid[row][col] = "_";
@@ -37,10 +42,13 @@ public class Puzzle {
         if (notFiveLetter || symbols) {
             System.out.println("*Invalid input: " + temp);
         }
+        if (notWord) {
+            System.out.println(temp + " is not a word");
+        }
     }
     
     public boolean makeGuess(String a) {
-        noInput = symbols = notFiveLetter = false;
+        noInput = symbols = notFiveLetter = notWord = false;
         temp = a.toLowerCase();
         if (temp.length() <= 0) { //filters empty inputs
             noInput = true;
@@ -52,6 +60,10 @@ public class Puzzle {
         }
         if (hasSign(temp)) { //filters inputs with signs
             symbols = true;
+            return true;
+        }
+        if (!isExistingWord(temp)) { //Checks if it is an actual word
+            notWord = true;
             return true;
         }
         guess = temp ; //input is valid to be a guess
@@ -86,5 +98,38 @@ public class Puzzle {
     
     public String getWord() {
         return word;
+    }
+    
+    public boolean isExistingWord(String temp) {
+        for (int i = 0; i < possibleWords.size(); i++) {
+            if (possibleWords.get(i).equals(temp)) return true;
+        }
+        return false;
+    }
+    
+    public void loadWords(String filename) {
+        File wordfile = new File(filename);
+        try {
+            Scanner fileScanner = new Scanner(wordfile);
+            boolean repeated = false;
+            while (fileScanner.hasNext()) {
+                String w = fileScanner.nextLine();
+                if (w.length() == 5 && !Character.isUpperCase(w.charAt(0))) {
+                    possibleWords.add(w);
+                    for (int i = 0; i < w.length(); i++) {
+                        if (w.substring(i+1).indexOf(w.substring(i,i+1)) != -1) {
+                            repeated = true;
+                        }
+                    }
+                    if (!repeated) {
+                        words.add(w);
+                    }
+                    repeated = false;
+                }
+            }
+        }
+        catch (FileNotFoundException e) {
+            System.out.print(e);
+        }
     }
 }
